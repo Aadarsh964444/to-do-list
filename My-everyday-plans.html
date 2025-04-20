@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Daily Planner</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .date-display {
+      text-align: center;
+      font-size: 18px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    .plan-input {
+      display: flex;
+      margin-bottom: 15px;
+    }
+
+    .plan-input input {
+      flex: 1;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px 0 0 8px;
+      outline: none;
+    }
+
+    .plan-input button {
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+    }
+
+    .plan-input button:hover {
+      background-color: #0056b3;
+    }
+
+    .plan-list {
+      margin-top: 20px;
+    }
+
+    .plan-item {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .plan-item span {
+      flex: 1;
+    }
+
+    .delete-btn {
+      background: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .delete-btn:hover {
+      background: #cc0000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🗓️ My Daily Planner</h1>
+    <div class="date-display" id="todayDate"></div>
+
+    <div class="plan-input">
+      <input type="text" id="planInput" placeholder="Add a new task..." />
+      <button onclick="addPlan()">Add</button>
+    </div>
+
+    <div class="plan-list" id="planList"></div>
+  </div>
+
+  <script>
+    const todayKey = new Date().toISOString().split("T")[0];
+    const planInput = document.getElementById("planInput");
+    const planList = document.getElementById("planList");
+    const dateDisplay = document.getElementById("todayDate");
+
+    function loadDate() {
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const today = new Date().toLocaleDateString(undefined, options);
+      dateDisplay.textContent = `Today: ${today}`;
+    }
+
+    function loadPlans() {
+      planList.innerHTML = "";
+      const plans = JSON.parse(localStorage.getItem(todayKey)) || [];
+      plans.forEach((plan, index) => {
+        const div = document.createElement("div");
+        div.className = "plan-item";
+        div.innerHTML = `
+          <span>${plan}</span>
+          <button class="delete-btn" onclick="deletePlan(${index})">Delete</button>
+        `;
+        planList.appendChild(div);
+      });
+    }
+
+    function addPlan() {
+      const text = planInput.value.trim();
+      if (!text) return;
+      const plans = JSON.parse(localStorage.getItem(todayKey)) || [];
+      plans.push(text);
+      localStorage.setItem(todayKey, JSON.stringify(plans));
+      planInput.value = "";
+      loadPlans();
+    }
+
+    function deletePlan(index) {
+      const plans = JSON.parse(localStorage.getItem(todayKey));
+      plans.splice(index, 1);
+      localStorage.setItem(todayKey, JSON.stringify(plans));
+      loadPlans();
+    }
+
+    loadDate();
+    loadPlans();
+  </script>
+</body>
+</html>
